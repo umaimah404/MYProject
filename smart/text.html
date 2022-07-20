@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        Speech to text
+    </title>
+    <meta charset="UTF-8">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+</head>
+
+<body>
+    <center>
+        <h1>Speech to text </h1>
+        <br></br>
+        <div>
+            <textarea id="content" name="content" rows="20" cols="70">
+
+        </textarea>
+
+            <br></br>
+            <button id="click_to_convert"> start
+
+            </button>
+        </div>
+    </center>
+    <script>
+        document.getElementById("click_to_convert").addEventListener("click", () => {
+            window.SpeechRecognition = window.webkitSpeechRecognition;
+            const recognition = new window.SpeechRecognition();
+            var text = $("#content");
+            var cont = '';
+            recognition.continuous = true;
+            recognition.lang = 'ar-AE';
+            
+          //  recognition.lang = 'en-US';
+
+            recognition.onresult = function (event) {
+                var current = event.resultIndex;
+                var transcript = event.results[current][0].transcript;
+                cont += transcript;
+                text.val(cont);
+            }
+            $("start-btn").click(function (event) {
+                if (cont.length) {
+                    cont += '';
+                }
+            })
+            recognition.start();
+            console.log(recognition);
+        })
+    </script>
+</body>
+
+</html>
