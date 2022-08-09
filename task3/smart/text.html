@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        Speech to text
+    </title>
+    <meta charset="UTF-8">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+</head>
+
+<body>
+    <center>
+        <h1>Speech to text </h1>
+        <br></br>
+        <div>
+            <textarea id="content" name="content" rows="20" cols="70">
+
+        </textarea>
+
+            <br></br>
+            <button id="click_to_convert"> start
+
+            </button>
+
+            <button  onclick="onConnectUsb()" id="connect-usb">
+                connect
+            </button>
+        </div>
+    </center>
+    <script>
+         let isConnectted = false;
+         let port;
+         let writer;
+         const enc = new TextEncoder();
+        document.getElementById("click_to_convert").addEventListener("click", () => {
+            window.SpeechRecognition = window.webkitSpeechRecognition;
+            const recognition = new window.SpeechRecognition();
+            var text = $("#content");
+            var cont = '';
+            recognition.continuous = true;
+            recognition.lang = 'ar-AE';
+            
+          //  recognition.lang = 'en-US';
+
+            recognition.onresult = function (event) {
+                var current = event.resultIndex;
+                var transcript = event.results[current][0].transcript;
+                cont += transcript;
+                text.val(cont);
+            }
+            $("start-btn").click(function (event) {
+                if (cont.length) {
+                    cont += '';
+                }
+            })
+            recognition.start();
+            console.log(recognition);
+        })
+
+        async function onChangeSpeech() {
+        if (!isConnectted) {
+          alert("you must connect to the usb in order to use this.");
+          return;
+        }
+        try {
+            const commandlist = cont;
+          const commandSplit = commandlist.split(" ")
+          const command = commandSplit.slice(-1);
+          const computerText = `${command}@`;
+          await writer.write(enc.encode(computerText));
+        } catch (e) {
+          console.log(e);
+         
+        }
+      }
+
+        async function onConnectUsb() {
+        try {
+          const requestOptions = {
+            // Filter on devices with the Arduino USB vendor ID.
+            filters: [{ usbVendorId: 0x2341 }],
+          };
+
+            // Request an Arduino from the user.
+            port = await navigator.serial.requestPort(requestOptions);
+          await port.open({ baudrate: 115200 });
+          writer = port.writable.getWriter();
+          isConnectted = true;
+        } catch (e) {
+          console.log("err", e);
+        }
+      }
+
+
+    </script>
+</body>
+
+</html>
